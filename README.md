@@ -418,4 +418,7 @@ PHP_Laravel12_SpellNumber/
 ---
 
 Your PHP_Laravel12_SpellNumber Project is now ready!
+<<<<<<< HEAD
 
+=======
+>>>>>>> development

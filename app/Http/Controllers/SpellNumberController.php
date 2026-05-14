@@ -8,10 +8,18 @@ use Rmunate\Utilities\SpellNumber;
 
 class SpellNumberController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $history = Conversion::latest()->get();
-        return view('spellnumber', compact('history'));
+        $search = $request->search;
+
+        $history = Conversion::when($search, function ($query) use ($search) {
+                $query->where('number', 'like', "%$search%")
+                      ->orWhere('words', 'like', "%$search%");
+            })
+            ->oldest()
+            ->paginate(4);
+
+        return view('spellnumber', compact('history', 'search'));
     }
 
     public function convert(Request $request)
@@ -20,16 +28,26 @@ class SpellNumberController extends Controller
             'number' => 'required|numeric'
         ]);
 
-        $number = $request->input('number');
-
+        $number = $request->number;
         $spell = SpellNumber::value($number)->toLetters();
 
-        // Save to database
         Conversion::create([
             'number' => $number,
             'words' => $spell,
         ]);
 
-        return redirect()->back()->with('success', "The number {$number} is spelled as: {$spell}");
+        return redirect()->back()->with('success', 'Converted successfully!');
+    }
+
+    public function destroy($id)
+    {
+        Conversion::findOrFail($id)->delete();
+        return redirect()->back()->with('success', 'Deleted successfully!');
+    }
+
+    public function clearAll()
+    {
+        Conversion::truncate();
+        return redirect()->back()->with('success', 'All history cleared!');
     }
 }
