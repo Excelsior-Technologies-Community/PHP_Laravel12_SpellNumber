@@ -11,6 +11,15 @@ class Conversion extends Model
 
     protected $fillable = [
         'number',
-        'words'
+        'words',
+        'locale',
+        'mode',
+        'currency',
+        'is_favorite'
+    ];
+
+    protected $casts = [
+        'number' => 'float',
+        'is_favorite' => 'boolean'
     ];
 }
